@@ -25,7 +25,7 @@ jobs:
     - name: Query koios for recent transactions
       id: query_api
       run: |
-        python update_transactions.py
+        python .github/scripts/update_transactions.py
 
     - name: Commit and push changes
       run: |
