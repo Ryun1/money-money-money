@@ -15,9 +15,9 @@ total ada received: 10,000
 
 ## All Transactions
 
-| txid | amount | receiving addr | block height |  reason |
-| --- | --- | --- | --- | --- |
-| de4cb90ce6a0163940d939feac1fe26583f33e9a0abf086504b8e051580682fb | +10,000 | N/A | 3199952 | funding received |
+| txid | epoch_no | block_height |
+| --- | --- | --- |
+| de4cb90ce6a0163940d939feac1fe26583f33e9a0abf086504b8e051580682fb | 50 | 3199950 |
 
 
 Last updated: 2025-02-19 15:45

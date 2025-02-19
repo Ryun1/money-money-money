@@ -21,14 +21,14 @@ def update_markdown(file_path, transactions):
         lines = file.readlines()
 
     try:
-        tx_table_start = lines.index('| txid | amount | receiving addr | block height |  reason |\n')
+        tx_table_start = lines.index('| txid | epoch_no | block_height |\n')
         tx_table_end = lines.index('\n', tx_table_start + 1)
     except ValueError:
         # If the table header is not found, add it
         tx_table_start = len(lines)
         lines.append('\n## All Transactions\n\n')
-        lines.append('| txid | amount | receiving addr | block height |  reason |\n')
-        lines.append('| --- | --- | --- | --- | --- |\n')
+        lines.append('| txid | epoch_no | block_height |\n')
+        lines.append('| --- | --- | --- |\n')
         tx_table_end = len(lines)
 
     existing_txids = [line.split('|')[1].strip() for line in lines[tx_table_start + 2:tx_table_end]]
@@ -36,7 +36,7 @@ def update_markdown(file_path, transactions):
     new_lines = lines[:tx_table_end]
     for tx in transactions:
         if tx['tx_hash'] not in existing_txids:
-            new_lines.append(f"| {tx['tx_hash']} | +{tx['amount']} | N/A | {tx['block_height']} | funding received |\n")
+            new_lines.append(f"| {tx['tx_hash']} | {tx['epoch_no']} | {tx['block_height']} |\n")
     new_lines.extend(lines[tx_table_end:])
 
     with open(file_path, 'w') as file:
