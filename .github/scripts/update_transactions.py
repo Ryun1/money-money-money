@@ -20,8 +20,17 @@ def update_markdown(file_path, transactions):
     with open(file_path, 'r') as file:
         lines = file.readlines()
 
-    tx_table_start = lines.index('| txid | amount | receiving addr | block height |  reason |\n')
-    tx_table_end = lines.index('\n', tx_table_start + 1)
+    try:
+        tx_table_start = lines.index('| txid | amount | receiving addr | block height |  reason |\n')
+        tx_table_end = lines.index('\n', tx_table_start + 1)
+    except ValueError:
+        # If the table header is not found, add it
+        tx_table_start = len(lines)
+        lines.append('\n## All Transactions\n\n')
+        lines.append('| txid | amount | receiving addr | block height |  reason |\n')
+        lines.append('| --- | --- | --- | --- | --- |\n')
+        tx_table_end = len(lines)
+
     existing_txids = [line.split('|')[1].strip() for line in lines[tx_table_start + 2:tx_table_end]]
 
     new_lines = lines[:tx_table_end]
