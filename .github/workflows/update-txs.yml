@@ -28,12 +28,14 @@ jobs:
         python .github/scripts/update_transactions.py
 
     - name: Commit and push changes
+      env:
+        GH_PAT: ${{ secrets.GH_PAT }}
       run: |
-        git config --global user.name 'github-actions[bot]'
-        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-        git stash
-        git pull --rebase origin main
-        git stash pop
-        git add .
-        git commit -m "Update transactions"
-        git push origin HEAD:main
+            git config --global user.name 'github-actions[bot]'
+            git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+            git stash
+            git pull --rebase origin main
+            git stash pop
+            git add .
+            git commit -m "Update transactions"
+            git push https://x-access-token:${GH_PAT}@github.com/${{ github.repository }} HEAD:main
