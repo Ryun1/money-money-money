@@ -55,20 +55,26 @@ def update_summary_markdown(file_path, addresses, balances):
         lines = file.readlines()
 
     try:
-        balance_table_start = lines.index('| address | balance |\n')
+        balance_table_start = lines.index('## Committee Address Balances\n')
         balance_table_end = lines.index('\n', balance_table_start + 1)
     except ValueError:
-        # If the table header is not found, add it
+        # If the header is not found, add it
         balance_table_start = len(lines)
         lines.append('\n## Committee Address Balances\n\n')
         lines.append('| address | balance |\n')
         lines.append('| --- | --- |\n')
         balance_table_end = len(lines)
+    else:
+        # Clear all data below the header
+        balance_table_end = balance_table_start + 1
+        while balance_table_end < len(lines) and lines[balance_table_end].strip() != '':
+            balance_table_end += 1
 
-    new_lines = lines[:balance_table_end]
+    new_lines = lines[:balance_table_start + 1]
+    new_lines.append('| address | balance |\n')
+    new_lines.append('| --- | --- |\n')
     for address, balance in zip(addresses, balances):
         new_lines.append(f"| {address} | {balance['balance']} |\n")
-    new_lines.extend(lines[balance_table_end:])
 
     with open(file_path, 'w') as file:
         file.writelines(new_lines)
