@@ -9,6 +9,13 @@ def get_transactions(addresses):
     response = requests.post(url, headers=headers, json=data)
     return response.json()
 
+def get_balance(addresses):
+    url = 'https://preprod.koios.rest/api/v1/address_info'
+    headers = {'accept': 'application/json', 'content-type': 'application/json'}
+    data = {'_addresses': addresses}
+    response = requests.post(url, headers=headers, json=data)
+    return response.json()
+
 def get_tx_info(tx_hashes):
     url = 'https://preprod.koios.rest/api/v1/tx_info'
     headers = {'accept': 'application/json', 'content-type': 'application/json'}
