@@ -23,7 +23,7 @@ def get_tx_info(tx_hashes):
     response = requests.post(url, headers=headers, json=data)
     return response.json()
 
-def update_markdown(file_path, transactions):
+def update_committee_markdown(file_path, transactions):
     with open(file_path, 'r') as file:
         lines = file.readlines()
 
@@ -49,18 +49,54 @@ def update_markdown(file_path, transactions):
     with open(file_path, 'w') as file:
         file.writelines(new_lines)
 
+# go to the summary.md page and update the table there
+def update_summary_markdown(file_path, addresses, balances):
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+
+    try:
+        balance_table_start = lines.index('| address | balance |\n')
+        balance_table_end = lines.index('\n', balance_table_start + 1)
+    except ValueError:
+        # If the table header is not found, add it
+        balance_table_start = len(lines)
+        lines.append('\n## Committee Address Balances\n\n')
+        lines.append('| address | balance |\n')
+        lines.append('| --- | --- |\n')
+        balance_table_end = len(lines)
+
+    new_lines = lines[:balance_table_end]
+    for address, balance in zip(addresses, balances):
+        new_lines.append(f"| {address} | {balance['balance']} |\n")
+    new_lines.extend(lines[balance_table_end:])
+
+    with open(file_path, 'w') as file:
+        file.writelines(new_lines)
+
+
+# Update committee pages
+
+# Iterate through committee pages find addresses to monitor
 addresses = []
 for file_name in os.listdir('gitbook'):
-    if file_name.endswith('.md'):
+    if file_name.endswith('committee.md'):
         with open(f'gitbook/{file_name}', 'r') as file:
             for line in file:
                 if line.startswith('- `addr'):
                     addresses.append(line.strip().strip('- `'))
 
+# Get balance for the addresses
+balances = get_balance(addresses)
+
+# Update the summary markdown file
+update_summary_markdown('gitbook/summary.md', addresses, balances)
+
+# Get transactions for the addresses
 transactions = get_transactions(addresses)
 tx_hashes = [tx['tx_hash'] for tx in transactions]
+# For each transaction found, use the transaction info endpoint
 tx_info = get_tx_info(tx_hashes)
 
 for file_name in os.listdir('gitbook'):
-    if file_name.endswith('.md'):
-        update_markdown(f'gitbook/{file_name}', tx_info)
+    if file_name.endswith('committee.md'):
+        update_committee_markdown(f'gitbook/{file_name}', tx_info)
